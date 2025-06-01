@@ -2,7 +2,7 @@ const Item = () => {
   return (
     <a href="/" className="flex flex-col gap-2">
       <img
-        src="../../public/images/cobertura-duplex.jpg"
+        src="../../images/cobertura-duplex.jpg"
         alt="Imagem da acomodação"
         className="aspect-square rounded-2xl object-cover"
       />
