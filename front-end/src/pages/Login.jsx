@@ -1,14 +1,29 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import axios from "axios";
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [user, setUser] = useState(null);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log(`Email submitted: ${email}`);
-    console.log(`Password submitted: ${password}`);
+
+    if (email && password) {
+      try {
+        const { data: userDoc } = await axios.post("/users/login", {
+          email,
+          password,
+        });
+        console.log("Login bem-sucedido:", userDoc);
+      } catch (error) {
+        alert(`Erro ao fazer login: ${error.response.data.error}`);
+        console.error(`Erro ao fazer login: ${error.response.data.error}`);
+      }
+    } else {
+      console.log("Por favor, preencha todos os campos.");
+    }
   };
 
   return (
