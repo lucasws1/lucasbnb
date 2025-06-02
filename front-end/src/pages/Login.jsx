@@ -27,7 +27,7 @@ const Login = ({ user, setUser }) => {
     }
   };
 
-  if (redirect) return <Navigate to="/" />;
+  if (redirect || user) return <Navigate to="/" />;
 
   return (
     <section className="flex items-center">

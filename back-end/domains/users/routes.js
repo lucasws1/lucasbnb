@@ -2,9 +2,12 @@ import { Router } from "express";
 import User from "./model.js";
 import bcrypt from "bcryptjs";
 import { connectDb } from "../../config/db.js";
+import jwt from "jsonwebtoken";
+import "dotenv/config";
 
 const router = Router();
 const bcryptSalt = bcrypt.genSaltSync();
+const { JWT_SECRET_KEY } = process.env;
 
 router.get("/", async (req, res) => {
   connectDb();
@@ -14,6 +17,22 @@ router.get("/", async (req, res) => {
     res.json(userDoc);
   } catch (error) {
     res.status(500).json({ error: "Erro ao buscar usuários" });
+  }
+});
+
+router.get("/profile", async (req, res) => {
+  const { token } = req.cookies;
+
+  if (!token) {
+    return res.status(401).json(null);
+  }
+
+  try {
+    const userInfo = jwt.verify(token, JWT_SECRET_KEY);
+
+    res.json(userInfo);
+  } catch (error) {
+    res.status(500).json(error);
   }
 });
 
@@ -30,7 +49,10 @@ router.post("/", async (req, res) => {
       password: encryptedPassword,
     });
 
-    res.json(newUserDoc);
+    const userObject = { name, email, _id: newUserDoc._id };
+    const token = jwt.sign(userObject, JWT_SECRET_KEY);
+
+    res.cookie("token", token).json(userObject);
   } catch (error) {
     res.status(500).json({ error: "Erro ao criar usuário" });
   }
@@ -48,11 +70,16 @@ router.post("/login", async (req, res) => {
       const passwordCorrect = bcrypt.compareSync(password, userDoc.password);
       const { _id, name } = userDoc;
 
-      passwordCorrect
-        ? res.json({ _id, name, email })
-        : res.status(400).json({ error: "Senha incorreta" });
+      if (passwordCorrect) {
+        const userObject = { _id, name, email };
+        const token = jwt.sign(userObject, JWT_SECRET_KEY);
+
+        res.cookie("token", token).json(userObject);
+      } else {
+        res.status(400).json({ error: "Senha incorreta" });
+      }
     } else {
-      res.status(404).json({ error: "Usuário não encontrado" });
+      res.status(400).json({ error: "Usuário não encontrado" });
     }
   } catch (error) {
     res.status(500).json({ error: "Erro ao buscar usuário" });
