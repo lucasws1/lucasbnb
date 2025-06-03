@@ -1,6 +1,9 @@
 import { Link } from "react-router-dom";
+import { useUserContext } from "../contexts/UserContext";
 
-const Header = ({ user, setUser }) => {
+const Header = () => {
+  const { user } = useUserContext();
+
   return (
     <header className="shadow-md">
       <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-8">
