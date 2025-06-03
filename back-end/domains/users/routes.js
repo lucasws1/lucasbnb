@@ -23,16 +23,13 @@ router.get("/", async (req, res) => {
 router.get("/profile", async (req, res) => {
   const { token } = req.cookies;
 
-  if (!token) {
-    return res.status(401).json(null);
-  }
-
-  try {
-    const userInfo = jwt.verify(token, JWT_SECRET_KEY);
-
-    res.json(userInfo);
-  } catch (error) {
-    res.status(500).json(error);
+  if (token) {
+    jwt.verify(token, JWT_SECRET_KEY, {}, (error, userInfo) => {
+      if (error) throw error;
+      res.json(userInfo);
+    });
+  } else {
+    res.status(401).json(null);
   }
 });
 
@@ -50,9 +47,11 @@ router.post("/", async (req, res) => {
     });
 
     const userObject = { name, email, _id: newUserDoc._id };
-    const token = jwt.sign(userObject, JWT_SECRET_KEY);
+    jwt.sign(userObject, JWT_SECRET_KEY, {}, (err, token) => {
+      if (err) throw err;
 
-    res.cookie("token", token).json(userObject);
+      res.cookie("token", token).json(userObject);
+    });
   } catch (error) {
     res.status(500).json({ error: "Erro ao criar usuário" });
   }
@@ -72,9 +71,10 @@ router.post("/login", async (req, res) => {
 
       if (passwordCorrect) {
         const userObject = { _id, name, email };
-        const token = jwt.sign(userObject, JWT_SECRET_KEY);
-
-        res.cookie("token", token).json(userObject);
+        jwt.sign(userObject, JWT_SECRET_KEY, {}, (err, token) => {
+          if (err) throw err;
+          res.cookie("token", token).json(userObject);
+        });
       } else {
         res.status(400).json({ error: "Senha incorreta" });
       }
