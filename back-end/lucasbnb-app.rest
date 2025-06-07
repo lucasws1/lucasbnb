@@ -16,3 +16,21 @@ Content-Type: application/json
   "email": "teste4@teste.com",
   "password": "123456789"
 }
+
+### POST /places - adicionar local
+POST http://localhost:3000/places
+Content-Type: application/json
+
+{
+    "owner": "683e2757c52a804ffd6597ac",
+    "title": "Casa de Praia",
+    "city": "Xangri-lá",
+    "photos": ["https://example.com/photo1.jpg", "https://example.com/photo2.jpg"],
+    "description": "Linda casa de praia com vista para o mar.",
+    "extras": "Wi-Fi, Ar-condicionado, Piscina",
+    "perks": ["perk1", "perk2", "perk3"],
+    "price": 150.00,
+    "checkin": "16:00",
+    "checkout": "12:00",
+    "guests": 6
+}
